@@ -754,7 +754,8 @@ export class PhasedScriptAction extends BaseScriptAction<IPhasedCommandConfig> {
         durationInSeconds: stopwatch.duration,
         result: success ? 'Succeeded' : 'Failed',
         extraData,
-        operationResults
+        operationResults,
+        processId: process.pid
       };
 
       this.hooks.beforeLog.call(logEntry);

@@ -94,6 +94,11 @@ export interface ITelemetryData {
   readonly result: 'Succeeded' | 'Failed';
 
   /**
+   * The ID of the process that did the work
+   */
+  readonly processId: number;
+
+  /**
    * The millisecond-resolution timestamp of the telemetry logging
    * @example 1648001893024
    */

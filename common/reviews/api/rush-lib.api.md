@@ -747,6 +747,7 @@ export interface ITelemetryData {
     readonly name: string;
     readonly operationResults?: Record<string, ITelemetryOperationResult>;
     readonly platform?: string;
+    readonly processId: number;
     readonly result: 'Succeeded' | 'Failed';
     readonly rushVersion?: string;
     readonly timestampMs?: number;

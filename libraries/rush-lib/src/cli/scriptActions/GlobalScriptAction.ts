@@ -178,7 +178,8 @@ export class GlobalScriptAction extends BaseScriptAction<IGlobalCommandConfig> {
         result: exitCode > 0 ? 'Failed' : 'Succeeded',
         extraData: {
           customParameterValue: customParameterValues.join(' ')
-        }
+        },
+        processId: process.pid
       });
 
       this.parser.flushTelemetry();

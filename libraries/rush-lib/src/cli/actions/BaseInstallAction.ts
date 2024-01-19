@@ -215,6 +215,7 @@ export abstract class BaseInstallAction extends BaseRushAction {
         name: 'install',
         durationInSeconds: stopwatch.duration,
         result: success ? 'Succeeded' : 'Failed',
+        processId: process.pid,
         extraData
       });
     }

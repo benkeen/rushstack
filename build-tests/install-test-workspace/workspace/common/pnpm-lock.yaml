@@ -4256,7 +4256,7 @@ packages:
       '@pnpm/link-bins': 5.3.25
       '@rushstack/heft-config-file': file:../temp/tarballs/rushstack-heft-config-file-0.14.4.tgz(@types/node@18.17.15)
       '@rushstack/node-core-library': file:../temp/tarballs/rushstack-node-core-library-3.63.0.tgz(@types/node@18.17.15)
-      '@rushstack/package-deps-hash': file:../temp/tarballs/rushstack-package-deps-hash-4.1.17.tgz(@types/node@18.17.15)
+      '@rushstack/package-deps-hash': file:../temp/tarballs/rushstack-package-deps-hash-4.1.18.tgz(@types/node@18.17.15)
       '@rushstack/package-extractor': file:../temp/tarballs/rushstack-package-extractor-0.6.20.tgz(@types/node@18.17.15)
       '@rushstack/rig-package': file:../temp/tarballs/rushstack-rig-package-0.5.1.tgz
       '@rushstack/stream-collator': file:../temp/tarballs/rushstack-stream-collator-4.1.18.tgz(@types/node@18.17.15)
@@ -4550,11 +4550,11 @@ packages:
       '@rushstack/node-core-library': file:../temp/tarballs/rushstack-node-core-library-3.63.0.tgz(@types/node@18.17.15)
     dev: true
 
-  file:../temp/tarballs/rushstack-package-deps-hash-4.1.17.tgz(@types/node@18.17.15):
-    resolution: {tarball: file:../temp/tarballs/rushstack-package-deps-hash-4.1.17.tgz}
-    id: file:../temp/tarballs/rushstack-package-deps-hash-4.1.17.tgz
+  file:../temp/tarballs/rushstack-package-deps-hash-4.1.18.tgz(@types/node@18.17.15):
+    resolution: {tarball: file:../temp/tarballs/rushstack-package-deps-hash-4.1.18.tgz}
+    id: file:../temp/tarballs/rushstack-package-deps-hash-4.1.18.tgz
     name: '@rushstack/package-deps-hash'
-    version: 4.1.17
+    version: 4.1.18
     dependencies:
       '@rushstack/node-core-library': file:../temp/tarballs/rushstack-node-core-library-3.63.0.tgz(@types/node@18.17.15)
     transitivePeerDependencies:
