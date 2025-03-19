@@ -1,3 +1,5 @@
+// FILE
+
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
@@ -80,6 +82,7 @@ export class RushCommandLineParser extends CommandLineParser {
   public readonly pluginManager: PluginManager;
 
   private readonly _debugParameter: CommandLineFlagParameter;
+  private readonly _debugCacheParameter: CommandLineFlagParameter;
   private readonly _quietParameter: CommandLineFlagParameter;
   private readonly _restrictConsoleOutput: boolean = RushCommandLineParser.shouldRestrictConsoleOutput();
   private readonly _rushOptions: IRushCommandLineParserOptions;
@@ -105,6 +108,13 @@ export class RushCommandLineParser extends CommandLineParser {
       parameterLongName: '--debug',
       parameterShortName: '-d',
       description: 'Show the full call stack if an error occurs while executing the tool'
+    });
+
+    this._debugCacheParameter = this.defineFlagParameter({
+      parameterLongName: '--debug-cache',
+      parameterShortName: '-c',
+      description:
+        'Generates a log file of all the inputs used in contructing the cache entry for any particular task'
     });
 
     this._quietParameter = this.defineFlagParameter({
@@ -137,6 +147,7 @@ export class RushCommandLineParser extends CommandLineParser {
 
     this.rushGlobalFolder = new RushGlobalFolder();
 
+    // HERE
     this.rushSession = new RushSession({
       getIsDebugMode: () => this.isDebug,
       terminalProvider: this._terminalProvider
@@ -169,6 +180,10 @@ export class RushCommandLineParser extends CommandLineParser {
 
   public get isDebug(): boolean {
     return this._debugParameter.value;
+  }
+
+  public get isDebugCache(): boolean {
+    return this._debugCacheParameter.value;
   }
 
   public get isQuiet(): boolean {
@@ -281,11 +296,12 @@ export class RushCommandLineParser extends CommandLineParser {
 
   private async _wrapOnExecuteAsync(): Promise<void> {
     if (this.rushConfiguration) {
+      // HERE
       this.telemetry = new Telemetry(this.rushConfiguration, this.rushSession);
     }
 
     try {
-      await super.onExecute();
+      await super.onExecute(); // HERE
     } finally {
       if (this.telemetry) {
         this.flushTelemetry();

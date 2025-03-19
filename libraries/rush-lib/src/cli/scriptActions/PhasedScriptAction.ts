@@ -447,6 +447,7 @@ export class PhasedScriptAction extends BaseScriptAction<IPhasedCommandConfig> {
         customParametersByName.set(configParameter.longName, parserParameter);
       }
 
+      // TODO
       if (buildCacheConfiguration?.buildCacheEnabled) {
         terminal.writeVerboseLine(`Incremental strategy: cache restoration`);
         new CacheableOperationPlugin({

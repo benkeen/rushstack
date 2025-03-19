@@ -70,6 +70,8 @@ export interface IRushPhaseSharding {
   shardOperationSettings?: unknown;
 }
 
+// HERE
+
 /**
  * @alpha
  */
@@ -336,6 +338,8 @@ export class RushProjectConfiguration {
     }
   }
 
+  // HERE
+
   /**
    * Examines the list of source files for the project and the target phase and returns a reason
    * why the project cannot enable the build cache for that phase, or undefined if it is safe to so do.
@@ -382,6 +386,8 @@ export class RushProjectConfiguration {
       }
     }
 
+    // HERE
+
     if (inputOutputFiles.length > 0) {
       return (
         'The following files are used to calculate project state ' +
@@ -389,6 +395,8 @@ export class RushProjectConfiguration {
       );
     }
   }
+
+  // looks like this is just Cobuilds related...
 
   /**
    * Source of truth for whether a project is unable to use the build cache for a given phase.

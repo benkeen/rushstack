@@ -1,3 +1,5 @@
+// FILE
+
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
@@ -219,6 +221,7 @@ export class ProjectBuildCache {
       return false;
     }
 
+    // HERE... called during afterTAsk action (or whatever) when it' sactually creating hte cache entry.... but this is just the cache entry content...
     const filesToCache: IPathsToCache | undefined = await this._tryCollectPathsToCacheAsync(terminal);
     if (!filesToCache) {
       return false;

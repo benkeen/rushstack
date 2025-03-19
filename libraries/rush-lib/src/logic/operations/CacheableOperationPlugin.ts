@@ -66,6 +66,9 @@ export interface IOperationBuildCacheContext {
   periodicCallback: PeriodicCallback;
   cacheRestored: boolean;
   isCacheReadAttempted: boolean;
+
+  // TODO
+  // createDebugCacheLogFile
 }
 
 export interface ICacheableOperationPluginOptions {
@@ -101,9 +104,8 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           );
         }
 
-        const disjointSet: DisjointSet<Operation> | undefined = cobuildConfiguration?.cobuildFeatureEnabled
-          ? new DisjointSet()
-          : undefined;
+        const cobuildDisjointSet: DisjointSet<Operation> | undefined =
+          cobuildConfiguration?.cobuildFeatureEnabled ? new DisjointSet() : undefined;
 
         for (const [operation, record] of recordByOperation) {
           const stateHash: string = (record as OperationExecutionRecord).calculateStateHash({
@@ -125,6 +127,8 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           const fileHashes: ReadonlyMap<string, string> | undefined =
             inputsSnapshot.getTrackedFileHashesForOperation(associatedProject, phaseName);
 
+          /// HERE riiiiiiight here.
+
           const cacheDisabledReason: string | undefined = projectConfiguration
             ? projectConfiguration.getCacheDisabledReason(fileHashes.keys(), phaseName, operation.isNoOp)
             : `Project does not have a ${RushConstants.rushProjectConfigFilename} configuration file, ` +
@@ -140,7 +144,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             }
           }
 
-          disjointSet?.add(operation);
+          cobuildDisjointSet?.add(operation);
 
           const buildCacheContext: IOperationBuildCacheContext = {
             // Supports cache writes by default for initial operations.
@@ -161,13 +165,18 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             cacheRestored: false,
             isCacheReadAttempted: false
           };
+
+          // cool, ok. This var contains almost everything we need and is used for processing the tasks.
+          // 1. add in the files + file hashes map (memory issues? Pretty sodding huge)
+          // 2. find when each task starts and generate the log file at that moment
+
           // Upstream runners may mutate the property of build cache context for downstream runners
           this._buildCacheContextByOperation.set(operation, buildCacheContext);
         }
 
-        if (disjointSet) {
-          clusterOperations(disjointSet, this._buildCacheContextByOperation);
-          for (const operationSet of disjointSet.getAllSets()) {
+        if (cobuildDisjointSet) {
+          clusterOperations(cobuildDisjointSet, this._buildCacheContextByOperation);
+          for (const operationSet of cobuildDisjointSet.getAllSets()) {
             if (cobuildConfiguration?.cobuildFeatureEnabled && cobuildConfiguration.cobuildContextId) {
               // Get a deterministic ordered array of operations, which is important to get a deterministic cluster id.
               const groupedOperations: Operation[] = Array.from(operationSet);
@@ -191,7 +200,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
               // Assign same cluster id to all operations in the same cluster.
               for (const record of groupedOperations) {
                 const buildCacheContext: IOperationBuildCacheContext =
-                  this._getBuildCacheContextByOperationOrThrow(record);
+                  this._getBuildCacheContextByOperationOrThrow(record); // HERE
                 buildCacheContext.cobuildClusterId = cobuildClusterId;
               }
             }
@@ -237,6 +246,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           return;
         }
 
+        // BEFORE EXECUTE
         const runBeforeExecute = async (): Promise<OperationStatus | undefined> => {
           if (
             !buildCacheContext.buildCacheTerminal ||
@@ -257,6 +267,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
 
           const buildCacheTerminal: ITerminal = buildCacheContext.buildCacheTerminal;
 
+          // HERE - getting cache
           let projectBuildCache: ProjectBuildCache | undefined = this._tryGetProjectBuildCache({
             buildCacheContext,
             buildCacheConfiguration,
@@ -302,7 +313,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             });
           }
 
-          // eslint-disable-next-line require-atomic-updates -- we are mutating the build cache context intentionally
+          // eslint-disable-next-l  ine require-atomic-updates -- we are mutating the build cache context intentionally
           buildCacheContext.cobuildLock = cobuildLock;
 
           // If possible, we want to skip this operation -- either by restoring it from the
@@ -322,6 +333,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             project,
             logFilenameIdentifier: operation.logFilenameIdentifier
           });
+
           const restoreCacheAsync = async (
             // TODO: Investigate if `projectBuildCacheForRestore` is always the same instance as `projectBuildCache`
             // above, and if it is, remove this parameter
@@ -350,6 +362,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             }
             return !!restoreFromCacheSuccess;
           };
+
           if (cobuildLock) {
             // handling rebuilds. "rush rebuild" or "rush retest" command will save operations to
             // the build cache once completed, but does not retrieve them (since the "incremental"
@@ -383,6 +396,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           } else if (buildCacheContext.isCacheReadAllowed) {
             const restoreFromCacheSuccess: boolean = await restoreCacheAsync(projectBuildCache);
 
+            // HERE - restoring from cache...
             if (restoreFromCacheSuccess) {
               return OperationStatus.FromCache;
             }
@@ -498,6 +512,9 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
               record.runner.warningsAreAllowed &&
               allowWarningsInSuccessfulBuild);
 
+          // -----------
+          // HERE - setting cache
+
           // If the command is successful, we can calculate project hash, and no dependencies were skipped,
           // write a new cache entry.
           if (!setCacheEntryPromise && taskIsSuccessful && isCacheWriteAllowed && operationBuildCache) {
@@ -569,6 +586,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
     return buildCacheContext;
   }
 
+  // HERE
   private _tryGetProjectBuildCache({
     buildCacheConfiguration,
     buildCacheContext,
@@ -765,6 +783,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
       return;
     }
 
+    // HERE log files paths
     const logFilePaths: ILogFilePaths = getProjectLogFilePaths({
       project: rushProject,
       logFilenameIdentifier: `${logFilenameIdentifier}.cache`

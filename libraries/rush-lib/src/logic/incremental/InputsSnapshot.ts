@@ -120,6 +120,8 @@ const { hashDelimiter } = RushConstants;
  * The methods on this interface are idempotent and will return the same result regardless of when they are executed.
  * @beta
  */
+
+// HERE
 export interface IInputsSnapshot {
   /**
    * The raw hashes of all tracked files in the repository.
