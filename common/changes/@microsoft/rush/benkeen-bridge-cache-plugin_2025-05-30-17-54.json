@@ -1,0 +1,10 @@
+{
+  "changes": [
+    {
+      "packageName": "@microsoft/rush",
+      "comment": "add bridge-cache plugin",
+      "type": "none"
+    }
+  ],
+  "packageName": "@microsoft/rush"
+}
