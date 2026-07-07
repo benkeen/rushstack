@@ -96,17 +96,53 @@ extends:
               - script: 'git config --local user.name Rushbot'
                 displayName: 'git config name'
 
-              - script: 'node common/scripts/install-run-rush.js install --to repo-toolbox'
-                displayName: 'Rush Install'
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: >
+                    install
+                    --to repo-toolbox
+                  DisplayName: 'Rush Install'
 
-              - script: 'node common/scripts/install-run-rush.js build --to repo-toolbox --verbose'
-                displayName: 'Rush Build (repo-toolbox)'
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: >
+                    build
+                    --to repo-toolbox
+                    --verbose
+                  DisplayName: 'Rush Build (repo-toolbox)'
 
-              - script: 'node repo-scripts/repo-toolbox/lib-commonjs/start.js bump-decoupled-local-dependencies'
-                displayName: 'Bump decoupled local dependencies'
+              - template: /common/config/azure-pipelines/templates/run-repo-toolbox.yaml@self
+                parameters:
+                  Arguments: 'bump-decoupled-local-dependencies'
+                  DisplayName: 'Bump decoupled local dependencies'
 
-              - script: 'node common/scripts/install-run-rush.js update'
-                displayName: 'Rush Update'
+              # If Rush itself was updated by bump-decoupled-local-dependencies, we need to bootstrap
+              # the new version and update the checked-in lockfile before running `rush update`.
+              # Otherwise install-run-rush.js would fail lockfile validation when trying to install
+              # the new version of Rush (the checked-in lockfile still references the old version).
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: '--help'
+                  DisplayName: 'Install new Rush version (skip lockfile validation)'
+                  DisableInstallRunRushLockfile: true
+                  Condition: "eq(variables['RushWasUpdated'], 'true')"
+
+              - bash: >
+                  cp
+                  "common/temp/install-run/@microsoft+rush@$(NewRushVersion)/package-lock.json"
+                  common/config/validation/rush-package-lock.json
+                displayName: 'Update rush-package-lock.json (new Rush version)'
+                condition: eq(variables['RushWasUpdated'], 'true')
+
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: 'update-autoinstaller --name plugins'
+                  DisplayName: 'Rush Update Autoinstaller (plugins)'
+
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: 'update'
+                  DisplayName: 'Rush Update'
 
               - bash: |
                   set -e
@@ -124,15 +160,15 @@ extends:
                   git commit -m "$(CommitMessage)"
                 displayName: 'Commit dependency changes'
 
-              - bash: |
-                  set -e
-
-                  node common/scripts/install-run-rush.js change \
-                    --bulk \
-                    --bump-type none \
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: >
+                    change
+                    --bulk
+                    --bump-type none
                     --commit-message "chore: generate change files for decoupled dependency bump"
-                displayName: 'Generate change files'
-                condition: and(succeeded(), eq(variables.HasChanges, 'true'))
+                  DisplayName: 'Generate change files'
+                  Condition: "and(succeeded(), eq(variables.HasChanges, 'true'))"
 
               - template: /common/config/azure-pipelines/templates/push-and-create-github-pr.yaml@self
                 parameters:
@@ -163,13 +199,22 @@ extends:
                 parameters:
                   NodeMajorVersion: 24
 
-              # Build the custom Docusaurus plugin for api-documenter in the
-              # rushstack-websites repo.
-              - script: 'node common/scripts/install-run-rush.js install'
-                displayName: 'Rush Install (rushstack-websites)'
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: 'install'
+                  DisplayName: 'Rush Install (rushstack-websites)'
+                  # rushstack-websites doesn't have an `install-run-rush` lockfile checked in
+                  DisableInstallRunRushLockfile: true
 
-              - script: 'node common/scripts/install-run-rush.js build --to-except api.rushstack.io --verbose'
-                displayName: 'Rush Build to-except api.rushstack.io (rushstack-websites)'
+              - template: /common/config/azure-pipelines/templates/install-run-rush.yaml@self
+                parameters:
+                  Arguments: >
+                    build
+                    --to-except api.rushstack.io
+                    --verbose
+                  DisplayName: 'Rush Build to-except api.rushstack.io (rushstack-websites)'
+                  # rushstack-websites doesn't have an `install-run-rush` lockfile checked in
+                  DisableInstallRunRushLockfile: true
 
               # Download the api artifact from the triggering publish pipeline.
               # AzDO automatically resolves which pipeline resource triggered this run.
@@ -187,7 +232,11 @@ extends:
               # Run api-documenter with the Docusaurus plugin from the
               # api.rushstack.io project directory so it picks up
               # config/api-documenter.json.
-              - script: 'npx @microsoft/api-documenter@latest generate --input-folder $(Pipeline.Workspace)/api --output-folder ./docs/pages'
+              - script: >
+                  npx @microsoft/api-documenter@latest
+                  generate
+                  --input-folder $(Pipeline.Workspace)/api
+                  --output-folder ./docs/pages
                 displayName: 'Generate API documentation'
                 workingDirectory: websites/api.rushstack.io
 

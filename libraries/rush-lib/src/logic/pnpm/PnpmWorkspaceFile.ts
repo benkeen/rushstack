@@ -3,14 +3,14 @@
 
 import * as path from 'node:path';
 
-import { FileSystem, Sort, Import, Path } from '@rushstack/node-core-library';
+import { escapePath as globEscape } from 'fast-glob';
+
+import { Sort, Import, Path } from '@rushstack/node-core-library';
 
 import { BaseWorkspaceFile } from '../base/BaseWorkspaceFile';
 import { PNPM_SHRINKWRAP_YAML_FORMAT } from './PnpmYamlCommon';
 
 const yamlModule: typeof import('js-yaml') = Import.lazy('js-yaml', require);
-
-const globEscape: (unescaped: string) => string = require('glob-escape'); // No @types/glob-escape package exists
 
 /**
  * This interface represents the raw pnpm-workspace.YAML file
@@ -23,14 +23,25 @@ const globEscape: (unescaped: string) => string = require('glob-escape'); // No 
  *      "default": {
  *        "react": "^18.0.0"
  *      }
+ *    },
+ *    "allowBuilds": {
+ *      "esbuild": true,
+ *      "fsevents": false
  *    }
  *  }
  */
 interface IPnpmWorkspaceYaml {
   /** The list of local package directories */
   packages: string[];
-  /** Named catalog definitions for centralized version management */
+  /** Catalog definitions for centralized version management */
   catalogs?: Record<string, Record<string, string>>;
+  /**
+   * Controls which packages are allowed to run build scripts. A value of `true` means the
+   * package is allowed to run build scripts; `false` means it is explicitly denied.
+   * Packages with build scripts not listed here will cause pnpm to fail with ERR_PNPM_IGNORED_BUILDS.
+   * (SUPPORTED ONLY IN PNPM 11.0.0 AND NEWER)
+   */
+  allowBuilds?: Record<string, boolean>;
 }
 
 export class PnpmWorkspaceFile extends BaseWorkspaceFile {
@@ -41,6 +52,7 @@ export class PnpmWorkspaceFile extends BaseWorkspaceFile {
 
   private _workspacePackages: Set<string>;
   private _catalogs: Record<string, Record<string, string>> | undefined;
+  private _allowBuilds: Record<string, boolean> | undefined;
 
   /**
    * The PNPM workspace file is used to specify the location of workspaces relative to the root
@@ -54,33 +66,7 @@ export class PnpmWorkspaceFile extends BaseWorkspaceFile {
     // If we need to support manual customization, that should be an additional parameter for "base file"
     this._workspacePackages = new Set<string>();
     this._catalogs = undefined;
-  }
-
-  /**
-   * Loads and returns the catalogs section from an existing pnpm-workspace.yaml file.
-   * This method handles both the singular 'catalog' field (for the default catalog) and
-   * the plural 'catalogs' field (for named catalogs), merging them into a single object.
-   *
-   * @param workspaceYamlFilename - The path to the pnpm-workspace.yaml file
-   * @returns The catalogs object, or undefined if the file doesn't exist or has no catalogs
-   */
-  public static async loadCatalogsFromFileAsync(
-    workspaceYamlFilename: string
-  ): Promise<Record<string, Record<string, string>> | undefined> {
-    let content: string;
-    try {
-      content = await FileSystem.readFileAsync(workspaceYamlFilename);
-    } catch (error) {
-      if (FileSystem.isNotExistError(error)) {
-        return undefined;
-      } else {
-        throw error;
-      }
-    }
-
-    const parsed: IPnpmWorkspaceYaml | undefined = yamlModule.load(content) as IPnpmWorkspaceYaml | undefined;
-
-    return parsed?.catalogs;
+    this._allowBuilds = undefined;
   }
 
   /**
@@ -89,6 +75,15 @@ export class PnpmWorkspaceFile extends BaseWorkspaceFile {
    */
   public setCatalogs(catalogs: Record<string, Record<string, string>> | undefined): void {
     this._catalogs = catalogs;
+  }
+
+  /**
+   * Sets the allowBuilds definitions for the workspace.
+   * This controls which packages are allowed to run build scripts in pnpm 11+.
+   * @param allowBuilds - A map of package name to boolean (true = allowed, false = denied)
+   */
+  public setAllowBuilds(allowBuilds: Record<string, boolean> | undefined): void {
+    this._allowBuilds = allowBuilds;
   }
 
   /** @override */
@@ -114,6 +109,10 @@ export class PnpmWorkspaceFile extends BaseWorkspaceFile {
 
     if (this._catalogs && Object.keys(this._catalogs).length > 0) {
       workspaceYaml.catalogs = this._catalogs;
+    }
+
+    if (this._allowBuilds && Object.keys(this._allowBuilds).length > 0) {
+      workspaceYaml.allowBuilds = this._allowBuilds;
     }
 
     return yamlModule.dump(workspaceYaml, PNPM_SHRINKWRAP_YAML_FORMAT);

@@ -1,6 +1,73 @@
 # Change Log - @rushstack/heft-typescript-plugin
 
-This log was last generated on Wed, 25 Feb 2026 21:39:42 GMT and should not be manually modified.
+This log was last generated on Sat, 13 Jun 2026 00:16:19 GMT and should not be manually modified.
+
+## 1.3.14
+Sat, 13 Jun 2026 00:16:19 GMT
+
+_Version update only_
+
+## 1.3.13
+Mon, 08 Jun 2026 15:15:50 GMT
+
+_Version update only_
+
+## 1.3.12
+Mon, 20 Apr 2026 23:31:13 GMT
+
+_Version update only_
+
+## 1.3.11
+Mon, 20 Apr 2026 15:15:24 GMT
+
+_Version update only_
+
+## 1.3.10
+Sat, 18 Apr 2026 03:47:10 GMT
+
+_Version update only_
+
+## 1.3.9
+Sat, 18 Apr 2026 00:15:16 GMT
+
+### Patches
+
+- Bump semver.
+
+## 1.3.8
+Fri, 17 Apr 2026 15:14:57 GMT
+
+_Version update only_
+
+## 1.3.7
+Fri, 10 Apr 2026 22:46:34 GMT
+
+_Version update only_
+
+## 1.3.6
+Thu, 09 Apr 2026 00:15:07 GMT
+
+_Version update only_
+
+## 1.3.5
+Sat, 04 Apr 2026 00:14:00 GMT
+
+_Version update only_
+
+## 1.3.4
+Wed, 01 Apr 2026 15:13:38 GMT
+
+_Version update only_
+
+## 1.3.3
+Tue, 31 Mar 2026 15:14:15 GMT
+
+_Version update only_
+
+## 1.3.2
+Mon, 09 Mar 2026 15:14:08 GMT
+
+_Version update only_
 
 ## 1.3.1
 Wed, 25 Feb 2026 21:39:42 GMT

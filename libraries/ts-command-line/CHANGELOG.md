@@ -1,6 +1,43 @@
 # Change Log - @rushstack/ts-command-line
 
-This log was last generated on Wed, 25 Feb 2026 00:34:30 GMT and should not be manually modified.
+This log was last generated on Sat, 13 Jun 2026 00:16:18 GMT and should not be manually modified.
+
+## 5.3.10
+Sat, 13 Jun 2026 00:16:18 GMT
+
+### Patches
+
+- Fix an issue where the error thrown for an unparseable environment variable mentions the value instead of the name.
+
+## 5.3.9
+Mon, 20 Apr 2026 23:31:13 GMT
+
+_Version update only_
+
+## 5.3.8
+Sat, 18 Apr 2026 03:47:10 GMT
+
+_Version update only_
+
+## 5.3.7
+Sat, 18 Apr 2026 00:15:17 GMT
+
+_Version update only_
+
+## 5.3.6
+Fri, 17 Apr 2026 15:14:57 GMT
+
+_Version update only_
+
+## 5.3.5
+Thu, 09 Apr 2026 00:15:07 GMT
+
+_Version update only_
+
+## 5.3.4
+Tue, 31 Mar 2026 15:14:14 GMT
+
+_Version update only_
 
 ## 5.3.3
 Wed, 25 Feb 2026 00:34:30 GMT

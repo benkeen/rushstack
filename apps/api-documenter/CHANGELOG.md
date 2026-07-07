@@ -1,6 +1,73 @@
 # Change Log - @microsoft/api-documenter
 
-This log was last generated on Wed, 25 Feb 2026 21:39:42 GMT and should not be manually modified.
+This log was last generated on Sat, 13 Jun 2026 00:16:19 GMT and should not be manually modified.
+
+## 7.30.7
+Sat, 13 Jun 2026 00:16:19 GMT
+
+_Version update only_
+
+## 7.30.6
+Mon, 08 Jun 2026 15:15:49 GMT
+
+_Version update only_
+
+## 7.30.5
+Mon, 20 Apr 2026 23:31:13 GMT
+
+_Version update only_
+
+## 7.30.4
+Mon, 20 Apr 2026 15:15:24 GMT
+
+_Version update only_
+
+## 7.30.3
+Sat, 18 Apr 2026 03:47:09 GMT
+
+_Version update only_
+
+## 7.30.2
+Sat, 18 Apr 2026 00:15:16 GMT
+
+_Version update only_
+
+## 7.30.1
+Fri, 17 Apr 2026 15:14:57 GMT
+
+_Version update only_
+
+## 7.30.0
+Fri, 10 Apr 2026 22:46:34 GMT
+
+### Minor changes
+
+- Add support for @defaultValue in Markdown and Yaml documenters
+
+## 7.29.11
+Thu, 09 Apr 2026 00:15:07 GMT
+
+_Version update only_
+
+## 7.29.10
+Sat, 04 Apr 2026 00:14:00 GMT
+
+_Version update only_
+
+## 7.29.9
+Wed, 01 Apr 2026 15:13:38 GMT
+
+_Version update only_
+
+## 7.29.8
+Tue, 31 Mar 2026 15:14:14 GMT
+
+_Version update only_
+
+## 7.29.7
+Mon, 09 Mar 2026 15:14:08 GMT
+
+_Version update only_
 
 ## 7.29.6
 Wed, 25 Feb 2026 21:39:42 GMT

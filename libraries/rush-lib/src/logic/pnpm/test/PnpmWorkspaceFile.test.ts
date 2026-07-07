@@ -12,7 +12,6 @@ describe(PnpmWorkspaceFile.name, () => {
 
   let mockWriteFile: jest.SpyInstance;
   let mockReadFile: jest.SpyInstance;
-  let mockReadFileAsync: jest.SpyInstance;
   let mockExists: jest.SpyInstance;
   let writtenContent: string | undefined;
 
@@ -30,23 +29,7 @@ describe(PnpmWorkspaceFile.name, () => {
     // Mock FileSystem.readFile to return the written content
     mockReadFile = jest.spyOn(FileSystem, 'readFile').mockImplementation(() => {
       if (writtenContent === undefined) {
-        throw Object.assign(new Error('ENOENT: no such file or directory'), {
-          code: 'ENOENT',
-          errno: -2,
-          syscall: 'open'
-        });
-      }
-      return writtenContent;
-    });
-
-    // Mock async version for loadCatalogsFromFileAsync
-    mockReadFileAsync = jest.spyOn(FileSystem, 'readFileAsync').mockImplementation(async () => {
-      if (writtenContent === undefined) {
-        throw Object.assign(new Error('ENOENT: no such file or directory'), {
-          code: 'ENOENT',
-          errno: -2,
-          syscall: 'open'
-        });
+        throw new Error('File not found');
       }
       return writtenContent;
     });
@@ -60,7 +43,6 @@ describe(PnpmWorkspaceFile.name, () => {
   afterEach(() => {
     mockWriteFile.mockRestore();
     mockReadFile.mockRestore();
-    mockReadFileAsync.mockRestore();
     mockExists.mockRestore();
   });
 
@@ -199,46 +181,65 @@ describe(PnpmWorkspaceFile.name, () => {
     });
   });
 
-  describe('loadCatalogsFromFileAsync', () => {
-    it('returns undefined for non-existent file', async () => {
-      const nonExistentFile: string = path.join(tempDir, 'non-existent.yaml');
-      const catalogs = await PnpmWorkspaceFile.loadCatalogsFromFileAsync(nonExistentFile);
-      expect(catalogs).toBeUndefined();
-    });
-
-    it('returns undefined when file has no catalogs', async () => {
+  describe('allowBuilds functionality', () => {
+    it('generates workspace file with allowBuilds', () => {
       const workspaceFile: PnpmWorkspaceFile = new PnpmWorkspaceFile(workspaceFilePath);
       workspaceFile.addPackage(path.join(projectsDir, 'app1'));
+
+      workspaceFile.setAllowBuilds({
+        esbuild: true,
+        '@parcel/watcher': true,
+        fsevents: false
+      });
+
       workspaceFile.save(workspaceFilePath, { onlyIfChanged: true });
 
-      const catalogs = await PnpmWorkspaceFile.loadCatalogsFromFileAsync(workspaceFilePath);
-      expect(catalogs).toBeUndefined();
+      const content: string = FileSystem.readFile(workspaceFilePath);
+      expect(content).toMatchSnapshot();
     });
 
-    it('loads catalogs from existing file', async () => {
+    it('generates workspace file with allowBuilds and catalogs', () => {
       const workspaceFile: PnpmWorkspaceFile = new PnpmWorkspaceFile(workspaceFilePath);
       workspaceFile.addPackage(path.join(projectsDir, 'app1'));
+
       workspaceFile.setCatalogs({
         default: {
-          react: '^18.0.0',
-          typescript: '~5.3.0'
-        },
-        frontend: {
-          vue: '^3.4.0'
+          react: '^18.0.0'
         }
       });
+
+      workspaceFile.setAllowBuilds({
+        esbuild: true
+      });
+
       workspaceFile.save(workspaceFilePath, { onlyIfChanged: true });
 
-      const catalogs = await PnpmWorkspaceFile.loadCatalogsFromFileAsync(workspaceFilePath);
-      expect(catalogs).toEqual({
-        default: {
-          react: '^18.0.0',
-          typescript: '~5.3.0'
-        },
-        frontend: {
-          vue: '^3.4.0'
-        }
-      });
+      const content: string = FileSystem.readFile(workspaceFilePath);
+      expect(content).toMatchSnapshot();
+    });
+
+    it('handles empty allowBuilds object', () => {
+      const workspaceFile: PnpmWorkspaceFile = new PnpmWorkspaceFile(workspaceFilePath);
+      workspaceFile.addPackage(path.join(projectsDir, 'app1'));
+
+      workspaceFile.setAllowBuilds({});
+
+      workspaceFile.save(workspaceFilePath, { onlyIfChanged: true });
+
+      const content: string = FileSystem.readFile(workspaceFilePath);
+      expect(content).not.toContain('allowBuilds');
+    });
+
+    it('handles undefined allowBuilds', () => {
+      const workspaceFile: PnpmWorkspaceFile = new PnpmWorkspaceFile(workspaceFilePath);
+      workspaceFile.addPackage(path.join(projectsDir, 'app1'));
+
+      workspaceFile.setAllowBuilds(undefined);
+
+      workspaceFile.save(workspaceFilePath, { onlyIfChanged: true });
+
+      const content: string = FileSystem.readFile(workspaceFilePath);
+      expect(content).not.toContain('allowBuilds');
     });
   });
 });

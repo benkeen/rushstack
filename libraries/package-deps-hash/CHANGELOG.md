@@ -1,6 +1,85 @@
 # Change Log - @rushstack/package-deps-hash
 
-This log was last generated on Wed, 25 Feb 2026 21:39:42 GMT and should not be manually modified.
+This log was last generated on Mon, 15 Jun 2026 15:15:33 GMT and should not be manually modified.
+
+## 4.7.21
+Mon, 15 Jun 2026 15:15:33 GMT
+
+### Patches
+
+- Strip GIT_DIR and GIT_WORK_TREE Node env variables to fix issues with miscalculating the git repo root when working in a linked worktree
+
+## 4.7.20
+Sat, 13 Jun 2026 00:16:19 GMT
+
+_Version update only_
+
+## 4.7.19
+Mon, 08 Jun 2026 15:15:50 GMT
+
+_Version update only_
+
+## 4.7.18
+Mon, 25 May 2026 15:14:32 GMT
+
+### Patches
+
+- Skip untracked files whose basename is a Windows reserved device name (e.g. `nul`, `con`, `aux`, `com1`-`com9`, `lpt1`-`lpt9`) when computing repo state on Windows. `git hash-object` cannot open such paths and otherwise aborts the entire repo-state calculation.
+
+## 4.7.17
+Mon, 20 Apr 2026 23:31:13 GMT
+
+_Version update only_
+
+## 4.7.16
+Mon, 20 Apr 2026 15:15:25 GMT
+
+_Version update only_
+
+## 4.7.15
+Sat, 18 Apr 2026 03:47:10 GMT
+
+_Version update only_
+
+## 4.7.14
+Sat, 18 Apr 2026 00:15:17 GMT
+
+_Version update only_
+
+## 4.7.13
+Fri, 17 Apr 2026 15:14:57 GMT
+
+_Version update only_
+
+## 4.7.12
+Fri, 10 Apr 2026 22:46:35 GMT
+
+_Version update only_
+
+## 4.7.11
+Thu, 09 Apr 2026 00:15:07 GMT
+
+_Version update only_
+
+## 4.7.10
+Sat, 04 Apr 2026 00:14:00 GMT
+
+_Version update only_
+
+## 4.7.9
+Wed, 01 Apr 2026 15:13:38 GMT
+
+_Version update only_
+
+## 4.7.8
+Tue, 31 Mar 2026 15:14:15 GMT
+
+_Version update only_
+
+## 4.7.7
+Mon, 09 Mar 2026 15:14:08 GMT
+
+_Version update only_
 
 ## 4.7.6
 Wed, 25 Feb 2026 21:39:42 GMT

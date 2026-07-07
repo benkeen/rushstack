@@ -1,123 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import * as path from 'node:path';
-import { FileSystem, JsonFile } from '@rushstack/node-core-library';
-import { TestUtilities } from '@rushstack/heft-config-file';
-import { RushConfiguration } from '../../api/RushConfiguration';
-import { PnpmWorkspaceFile } from '../../logic/pnpm/PnpmWorkspaceFile';
+import { RushPnpmCommandLineParser } from '../RushPnpmCommandLineParser';
 
-const PACKAGE_ROOT: string = path.resolve(__dirname, '../../..');
-const CATALOG_SYNC_REPO_PATH: string = `${__dirname}/catalogSyncTestRepo`;
+interface IRushPnpmCommandLineParserInternals {
+  _validatePnpmUsageAsync(pnpmArgs: string[]): Promise<void>;
+}
 
-describe('RushPnpmCommandLineParser', () => {
-  describe('catalog syncing', () => {
-    const testRepoPath: string = `${PACKAGE_ROOT}/temp/catalog-sync-test-repo`;
-    const pnpmConfigPath: string = `${testRepoPath}/common/config/rush/pnpm-config.json`;
-    const pnpmWorkspacePath: string = `${testRepoPath}/common/temp/pnpm-workspace.yaml`;
+async function validatePnpmArgsAsync(pnpmArgs: string[]): Promise<string[]> {
+  const parser: IRushPnpmCommandLineParserInternals = Object.create(RushPnpmCommandLineParser.prototype);
+  await parser._validatePnpmUsageAsync(pnpmArgs);
+  return pnpmArgs;
+}
 
-    beforeEach(async () => {
-      await FileSystem.copyFilesAsync({ sourcePath: CATALOG_SYNC_REPO_PATH, destinationPath: testRepoPath });
-    });
+describe(RushPnpmCommandLineParser.name, () => {
+  it('adds recursive mode to workspace query commands by default', async () => {
+    await expect(validatePnpmArgsAsync(['outdated'])).resolves.toEqual(['outdated', '--recursive']);
+    await expect(validatePnpmArgsAsync(['why', '@rushstack/node-core-library'])).resolves.toEqual([
+      'why',
+      '--recursive',
+      '@rushstack/node-core-library'
+    ]);
+  });
 
-    afterEach(async () => {
-      await FileSystem.deleteFolderAsync(testRepoPath);
-    });
+  it('does not duplicate explicit recursive flags', async () => {
+    await expect(validatePnpmArgsAsync(['outdated', '-r'])).resolves.toEqual(['outdated', '-r']);
+    await expect(
+      validatePnpmArgsAsync(['why', '--recursive', '@rushstack/node-core-library'])
+    ).resolves.toEqual(['why', '--recursive', '@rushstack/node-core-library']);
+  });
 
-    it('syncs updated catalogs from pnpm-workspace.yaml to pnpm-config.json', async () => {
-      const updatedWorkspaceYaml = `packages:
-  - '../../apps/*'
-catalogs:
-  default:
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    typescript: ~5.3.0
-  frontend:
-    vue: ^3.4.0
-`;
-      await FileSystem.writeFileAsync(pnpmWorkspacePath, updatedWorkspaceYaml);
-
-      const rushConfiguration: RushConfiguration = RushConfiguration.loadFromConfigurationFile(
-        `${testRepoPath}/rush.json`
-      );
-
-      const subspace = rushConfiguration.getSubspace('default');
-      const pnpmOptions = subspace.getPnpmOptions();
-
-      expect(TestUtilities.stripAnnotations(pnpmOptions?.globalCatalogs)).toEqual({
-        default: {
-          react: '^18.0.0',
-          'react-dom': '^18.0.0'
-        }
-      });
-
-      const newCatalogs = await PnpmWorkspaceFile.loadCatalogsFromFileAsync(pnpmWorkspacePath);
-
-      await pnpmOptions?.updateGlobalCatalogsAsync(newCatalogs);
-
-      const updatedRushConfiguration: RushConfiguration = RushConfiguration.loadFromConfigurationFile(
-        `${testRepoPath}/rush.json`
-      );
-      const updatedSubspace = updatedRushConfiguration.getSubspace('default');
-      const updatedPnpmOptions = updatedSubspace.getPnpmOptions();
-
-      expect(TestUtilities.stripAnnotations(updatedPnpmOptions?.globalCatalogs)).toEqual({
-        default: {
-          react: '^18.2.0',
-          'react-dom': '^18.2.0',
-          typescript: '~5.3.0'
-        },
-        frontend: {
-          vue: '^3.4.0'
-        }
-      });
-    });
-
-    it('does not update pnpm-config.json when catalogs are unchanged', async () => {
-      const newCatalogs = await PnpmWorkspaceFile.loadCatalogsFromFileAsync(pnpmWorkspacePath);
-
-      const rushConfiguration: RushConfiguration = RushConfiguration.loadFromConfigurationFile(
-        `${testRepoPath}/rush.json`
-      );
-      const subspace = rushConfiguration.getSubspace('default');
-      const pnpmOptions = subspace.getPnpmOptions();
-
-      await pnpmOptions?.updateGlobalCatalogsAsync(newCatalogs);
-
-      const savedConfig = JsonFile.load(pnpmConfigPath);
-      expect(savedConfig.globalCatalogs).toEqual({
-        default: {
-          react: '^18.0.0',
-          'react-dom': '^18.0.0'
-        }
-      });
-    });
-
-    it('removes catalogs when pnpm-workspace.yaml has no catalogs', async () => {
-      const workspaceWithoutCatalogs = `packages:
-  - '../../apps/*'
-`;
-      await FileSystem.writeFileAsync(pnpmWorkspacePath, workspaceWithoutCatalogs);
-
-      const newCatalogs = await PnpmWorkspaceFile.loadCatalogsFromFileAsync(pnpmWorkspacePath);
-
-      expect(newCatalogs).toBeUndefined();
-
-      const rushConfiguration: RushConfiguration = RushConfiguration.loadFromConfigurationFile(
-        `${testRepoPath}/rush.json`
-      );
-      const subspace = rushConfiguration.getSubspace('default');
-      const pnpmOptions = subspace.getPnpmOptions();
-
-      await pnpmOptions?.updateGlobalCatalogsAsync(newCatalogs);
-
-      const updatedRushConfiguration: RushConfiguration = RushConfiguration.loadFromConfigurationFile(
-        `${testRepoPath}/rush.json`
-      );
-      const updatedSubspace = updatedRushConfiguration.getSubspace('default');
-      const updatedPnpmOptions = updatedSubspace.getPnpmOptions();
-
-      expect(updatedPnpmOptions?.globalCatalogs).toBeUndefined();
-    });
+  it('does not force recursive mode for global outdated checks', async () => {
+    await expect(validatePnpmArgsAsync(['outdated', '--global'])).resolves.toEqual(['outdated', '--global']);
   });
 });

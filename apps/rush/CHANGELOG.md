@@ -1,6 +1,140 @@
 # Change Log - @microsoft/rush
 
-This log was last generated on Mon, 23 Feb 2026 00:42:39 GMT and should not be manually modified.
+This log was last generated on Sat, 20 Jun 2026 21:37:30 GMT and should not be manually modified.
+
+## 5.177.1
+Sat, 20 Jun 2026 21:37:30 GMT
+
+### Updates
+
+- Bump `ws` in `rush-serve-plugin` to mitigate CVE-2026-48779.
+
+## 5.177.0
+Sat, 20 Jun 2026 00:16:15 GMT
+
+### Patches
+
+- Set Redis `connectTimeout` and `socketTimeout` so half-dead TCP connections (NAT/firewall) surface in seconds instead of stalling in-flight commands for many minutes while the kernel waits to give up.
+
+### Updates
+
+- Fix build cache failures when running inside a git linked worktree via a pre-commit hook, caused by GIT_DIR being set to the per-worktree metadata directory
+
+## 5.176.0
+Tue, 09 Jun 2026 02:02:32 GMT
+
+### Minor changes
+
+- Add support for pnpm 11's `allowBuilds` field in `pnpm-workspace.yaml`. Rush now correctly handles the pnpm 11 security model where build scripts must be explicitly approved. The new `globalAllowBuilds` field in `pnpm-config.json` replaces the deprecated `globalOnlyBuiltDependencies` and `globalNeverBuiltDependencies` fields for pnpm 11+. The `rush-pnpm approve-builds` command is also updated to work correctly with pnpm 11.
+- Include seconds in the generated change file name so that running `rush change` more than once in the same minute no longer silently overwrites the previously generated change file.
+- Default `rush-pnpm outdated` and `rush-pnpm why` to recursive workspace queries.
+
+### Patches
+
+- Fix a regression where Rush change-detection treated any `pnpm-config.json` containing comments as unparseable, causing every project to be flagged as impacted.
+- Route the "Lockfile was created or deleted" warning to stderr so that machine-readable output (e.g. `rush list --json`) remains parseable when the lockfile was added or removed in the diff range.
+- Fix `rush update` not syncing `pnpm-lock.yaml` when a workspace dependency moves from `dependencies` to `devDependencies`.
+
+### Updates
+
+- Bump the `ws` dependency to `~8.20.0`.
+
+## 5.175.1
+Mon, 20 Apr 2026 23:31:34 GMT
+
+### Updates
+
+- Fix an issue where `rush list --detailed` did not print horizontal table separators.
+
+## 5.175.0
+Sat, 18 Apr 2026 03:47:29 GMT
+
+### Patches
+
+- Bump the Azure cache plugin dependencies to use `@azure/identity` `~4.13.1` and `@azure/storage-blob` `~12.31.0`.
+- Remove unused dependencies: replace `glob-escape` with `fast-glob`'s `escapePath`, replace `figures.pointer` with a named const, replace `builtin-modules` with `node:module.isBuiltin()`.
+- Replace `cli-table` dependency with `TerminalTable` from `@rushstack/terminal`.
+
+### Updates
+
+- Bump semver.
+- Replace deprecated `inquirer` packages with modern per-prompt `@inquirer/*` family of packages.
+
+## 5.174.0
+Thu, 16 Apr 2026 05:25:41 GMT
+
+### Minor changes
+
+- Add support for pnpm `trustPolicy`, `trustPolicyExclude`, and `trustPolicyIgnoreAfterMinutes` settings in `pnpm-config.json`.
+
+### Updates
+
+- rush-resolver-cache-plugin: add pnpm 10 / lockfile v9 compatibility
+- Deprecate `minimumReleaseAge` in `common/config/rush/pnpm-config.json`; use `minimumReleaseAgeMinutes` instead
+- Add support for pnpm global catalog detection to `rush change`. Now, when a dependencyis changed in the pnpm global catalog, changelogs will be required for affected published packages.
+- Fix a bug where the injected dependency state hash updated on devDependency changes that don't impact the lockfile.
+- Add "strictChangefileValidation" experiment and "--verify-all" flag for "rush change". When the experiment is enabled, "rush change --verify" and "rush change --verify-all" will report errors if change files reference nonexistent projects or target non-main projects in a lockstepped version policy.
+
+## 5.173.0
+Fri, 10 Apr 2026 22:46:54 GMT
+
+### Minor changes
+
+- Add async variants of disk-touching APIs in `PackageJsonEditor` (`loadAsync`, `saveIfModifiedAsync`), `CommonVersionsConfiguration` (`loadFromFileAsync`, `saveAsync`), and `VersionPolicy` (`setDependenciesBeforePublishAsync`, `setDependenciesBeforeCommitAsync`); deprecate corresponding sync methods.
+
+### Updates
+
+- Move stale autoinstaller `node_modules` folders into Rush's recycler before asynchronously deleting them, instead of synchronously deleting them in place.
+- Filter npm-incompatible properties from .npmrc when installing rush-lib via npm, to eliminate spurious "Unknown env config" and "Unknown project config" warnings.
+- When cobuilds are remote executing, check them after locally executable tasks.
+
+## 5.172.1
+Wed, 25 Mar 2026 01:01:07 GMT
+
+### Updates
+
+- Fix an issue where "rush deploy" could fail with EEXIST due to a "npm-packlist" regression (GitHub #5720)
+
+## 5.172.0
+Tue, 24 Mar 2026 21:52:13 GMT
+
+### Updates
+
+- Add `getCustomParametersByLongName()` and `setHandled()` to `IGlobalCommand`, enabling Rush plugins to handle global command execution and access parsed command-line parameter values.
+- Add a new "globalPlugin" command kind for command-line.json that allows Rush plugins to define global commands without a shellCommand. This command kind can only be used in plugin-provided command-line.json files.
+
+## 5.171.0
+Sat, 21 Mar 2026 03:10:24 GMT
+
+### Minor changes
+
+- Add RUSH_QUIET_MODE environment variable that, when set to `1` or `true`, is equivalent to passing `--quiet` for `rush`, `rushx`, and `install-run-rush.ts`
+
+### Patches
+
+- Update OperationExecutionRecord to only set `this.logFilePaths` if the value to be assigned is not `undefined`
+- Fix ProblemCollector wiring in OperationExecutionRecord: add preventAutoclose, strip ANSI colors before matching, and always include problemCollector in the terminal pipeline
+- Fix weighted concurrency budget being capped by operation count
+
+### Updates
+
+- Fix an issue where the assets used by `rush init` weren't shipped.
+
+## 5.170.1
+Thu, 12 Mar 2026 22:33:34 GMT
+
+### Updates
+
+- Fix a recent regression that sometimes produced ENOENT errors when installing autoinstallers
+
+## 5.170.0
+Thu, 12 Mar 2026 09:15:52 GMT
+
+### Updates
+
+- Add custom endpoint support via a `storageEndpoint` configuration option for the Azure Storage build cache plugin.
+- Fix autoinstaller plugin loader behavior.
+- Support percentage weight in operationSettings in rush-project.json file.
 
 ## 5.169.3
 Mon, 23 Feb 2026 00:42:39 GMT

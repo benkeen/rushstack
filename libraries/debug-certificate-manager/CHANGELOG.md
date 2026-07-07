@@ -1,6 +1,78 @@
 # Change Log - @rushstack/debug-certificate-manager
 
-This log was last generated on Wed, 25 Feb 2026 21:39:42 GMT and should not be manually modified.
+This log was last generated on Sat, 13 Jun 2026 00:16:19 GMT and should not be manually modified.
+
+## 1.7.20
+Sat, 13 Jun 2026 00:16:19 GMT
+
+_Version update only_
+
+## 1.7.19
+Mon, 08 Jun 2026 15:15:50 GMT
+
+_Version update only_
+
+## 1.7.18
+Mon, 20 Apr 2026 23:31:13 GMT
+
+_Version update only_
+
+## 1.7.17
+Mon, 20 Apr 2026 15:15:24 GMT
+
+_Version update only_
+
+## 1.7.16
+Sat, 18 Apr 2026 03:47:10 GMT
+
+_Version update only_
+
+## 1.7.15
+Sat, 18 Apr 2026 00:15:16 GMT
+
+_Version update only_
+
+## 1.7.14
+Fri, 17 Apr 2026 15:14:57 GMT
+
+_Version update only_
+
+## 1.7.13
+Fri, 10 Apr 2026 22:46:34 GMT
+
+_Version update only_
+
+## 1.7.12
+Thu, 09 Apr 2026 00:15:07 GMT
+
+_Version update only_
+
+## 1.7.11
+Sat, 04 Apr 2026 00:14:00 GMT
+
+_Version update only_
+
+## 1.7.10
+Thu, 02 Apr 2026 00:14:38 GMT
+
+### Patches
+
+- Bump node-forge to 1.4.0 to address CVEs GHSA-2328-f5f3-gj25, GHSA-q67f-28xg-22rw, GHSA-5m6q-g25r-mvwx, GHSA-ppp5-5v6c-4jwp"
+
+## 1.7.9
+Wed, 01 Apr 2026 15:13:38 GMT
+
+_Version update only_
+
+## 1.7.8
+Tue, 31 Mar 2026 15:14:15 GMT
+
+_Version update only_
+
+## 1.7.7
+Mon, 09 Mar 2026 15:14:08 GMT
+
+_Version update only_
 
 ## 1.7.6
 Wed, 25 Feb 2026 21:39:42 GMT

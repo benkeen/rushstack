@@ -1,6 +1,94 @@
 # Change Log - @rushstack/playwright-browser-tunnel
 
-This log was last generated on Wed, 25 Feb 2026 21:39:42 GMT and should not be manually modified.
+This log was last generated on Sat, 20 Jun 2026 21:37:11 GMT and should not be manually modified.
+
+## 0.3.23
+Sat, 20 Jun 2026 21:37:11 GMT
+
+### Patches
+
+- Bump `ws` in `rush-serve-plugin` to mitigate CVE-2026-48779.
+
+## 0.3.22
+Sat, 13 Jun 2026 00:16:19 GMT
+
+_Version update only_
+
+## 0.3.21
+Mon, 08 Jun 2026 15:15:50 GMT
+
+_Version update only_
+
+## 0.3.20
+Sat, 25 Apr 2026 00:15:59 GMT
+
+### Patches
+
+- Bump the `ws` dependency to `~8.20.0`.
+
+## 0.3.19
+Mon, 20 Apr 2026 23:31:13 GMT
+
+_Version update only_
+
+## 0.3.18
+Mon, 20 Apr 2026 15:15:25 GMT
+
+_Version update only_
+
+## 0.3.17
+Sat, 18 Apr 2026 03:47:10 GMT
+
+_Version update only_
+
+## 0.3.16
+Sat, 18 Apr 2026 00:15:16 GMT
+
+### Patches
+
+- Bump semver.
+
+## 0.3.15
+Fri, 17 Apr 2026 15:14:57 GMT
+
+_Version update only_
+
+## 0.3.14
+Fri, 10 Apr 2026 22:46:35 GMT
+
+_Version update only_
+
+## 0.3.13
+Thu, 09 Apr 2026 00:15:07 GMT
+
+_Version update only_
+
+## 0.3.12
+Sat, 04 Apr 2026 00:14:00 GMT
+
+_Version update only_
+
+## 0.3.11
+Wed, 01 Apr 2026 15:13:38 GMT
+
+_Version update only_
+
+## 0.3.10
+Tue, 31 Mar 2026 15:14:15 GMT
+
+_Version update only_
+
+## 0.3.9
+Mon, 09 Mar 2026 15:14:08 GMT
+
+_Version update only_
+
+## 0.3.8
+Fri, 06 Mar 2026 01:14:37 GMT
+
+### Patches
+
+- Fix the launch-options param
 
 ## 0.3.7
 Wed, 25 Feb 2026 21:39:42 GMT
